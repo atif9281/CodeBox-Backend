@@ -27,6 +27,5 @@ exports.getTogetherAIResponse = async (prompt) => {
     }
   );
 
-  console.log(response.data);
   return response.data.output.choices[0].text;
 };

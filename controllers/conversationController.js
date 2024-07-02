@@ -19,22 +19,8 @@ exports.sendMessage = async (req, res, next) => {
       return res.status(400).json({ error: 'Missing conversationId, message, or sender' });
     }
 
-    console.log('Received message:', { conversationId, message, sender });
-
-    // Save user message to the database
-    // const userMessage = await prisma.message.create({
-    //   data: {
-    //     conversationId,
-    //     sender,
-    //     content: message
-    //   }
-    // });
-
-
     // Process message with AI service (example)
     const botResponse = await sendMessage(conversationId, message, sender);
-
-    console.log('Bot response:', botResponse);
 
     // Return the bot response to the client
     res.json({ response: botResponse });
