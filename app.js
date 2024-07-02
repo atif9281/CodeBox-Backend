@@ -1,16 +1,16 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const next = require('next');
+// const next = require('next');
 const cors = require('cors')
 const conversationRoutes = require('./routes/conversationRoutes');
 
-const dev = process.env.NODE_ENV !== 'production';
-const nextApp = next({ dev, dir: '../frontend' }); // Make sure the dir points to 'frontend' directory
-const handle = nextApp.getRequestHandler();
+// const dev = process.env.NODE_ENV !== 'production';
+// const nextApp = next({ dev, dir: '../frontend' }); // Make sure the dir points to 'frontend' directory
+// const handle = nextApp.getRequestHandler();
 
 const app = express();
 
-nextApp.prepare().then(() => {
+// nextApp.prepare().then(() => {
   // Middleware
   app.use(bodyParser.json());
 app.use(cors())
@@ -33,4 +33,4 @@ app.use(cors())
   app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
   });
-});
+// });
