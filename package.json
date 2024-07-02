@@ -18,8 +18,10 @@
     "next": "^14.2.4",
     "nodemon": "^3.1.4",
     "pg": "^8.12.0",
-    "prisma": "^5.15.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "prisma": "^5.15.1"
   }
 }
