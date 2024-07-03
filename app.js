@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const conversationRoutes = require('./routes/conversationRoutes');
+const authRoutes = require('./routes/authRoutes')
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use(cors());
 
 // API Routes
 app.use('/api', conversationRoutes);
+app.use('/api', authRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

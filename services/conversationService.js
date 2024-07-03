@@ -21,9 +21,14 @@ exports.startConversation = async () => {
 };
 
 exports.sendMessage = async (conversationId, message, sender) => {
+
+
+
   if (!conversationId || !message || !sender) {
     throw new Error('Missing conversationId, message, or sender');
   }
+  
+
 
   const botResponse = await getTogetherAIResponse(message);
 

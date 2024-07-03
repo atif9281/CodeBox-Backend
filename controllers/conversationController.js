@@ -1,6 +1,8 @@
 const { sendMessage, startConversation, getConversation,  deleteConversationById, getAllConversationIds} = require('../services/conversationService');
 const prisma = require('../models/prismaClient'); // Assuming prismaClient is correctly configured
 
+
+
 // Handler for starting a new conversation
 exports.startConversation = async (req, res, next) => {
   try {
@@ -15,7 +17,9 @@ exports.startConversation = async (req, res, next) => {
 exports.sendMessage = async (req, res, next) => {
   const { conversationId, message, sender } = req.body;
   try {
-    if (!conversationId || !message || !sender) {
+    
+
+    if (!message || !sender) {
       return res.status(400).json({ error: 'Missing conversationId, message, or sender' });
     }
 
