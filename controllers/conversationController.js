@@ -19,7 +19,7 @@ exports.sendMessage = async (req, res, next) => {
   try {
     
 
-    if (!message || !sender) {
+    if (!conversationId || !message || !sender) {
       return res.status(400).json({ error: 'Missing conversationId, message, or sender' });
     }
 
