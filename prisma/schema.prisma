@@ -8,18 +8,21 @@ generator client {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String   // This should be hashed in a real application
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int            @id @default(autoincrement())
+  name          String
+  email         String         @unique
+  password      String         // This should be hashed in a real application
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  conversations Conversation[] // Link to conversations
 }
 
 model Conversation {
   id        String   @id @default(uuid())
   messages  Message[]
   createdAt DateTime @default(now())
+  userId    Int      // Foreign key to User
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Message {

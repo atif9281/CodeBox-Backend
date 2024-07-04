@@ -1,26 +1,35 @@
-const { sendMessage, startConversation, getConversation,  deleteConversationById, getAllConversationIds} = require('../services/conversationService');
+const { sendMessage, startConversation, getConversation, deleteConversationById } = require('../services/conversationService');
 const prisma = require('../models/prismaClient'); // Assuming prismaClient is correctly configured
-
-
 
 // Handler for starting a new conversation
 exports.startConversation = async (req, res, next) => {
+  const userId = req.user.id; // Get the user ID from the authenticated user
+
   try {
-    const conversation = await startConversation(); // Assuming startConversation returns a conversation object
-    res.json({ conversationId: conversation.id });
+    const conversation = await startConversation(userId); // Call service function to start conversation
+    res.json({ conversationId: conversation.id }); // Send conversation ID in response
   } catch (error) {
     console.error('Error starting conversation:', error);
-    next(error); // Pass error to Express error handler
+    next(error); // Pass error to Express error handler middleware
   }
 };
 
 exports.sendMessage = async (req, res, next) => {
   const { conversationId, message, sender } = req.body;
-  try {
-    
+  const userId = req.user.id; // Get the user ID from the authenticated user
 
+  try {
     if (!conversationId || !message || !sender) {
       return res.status(400).json({ error: 'Missing conversationId, message, or sender' });
+    }
+
+    // Ensure the conversation belongs to the authenticated user
+    const conversation = await prisma.conversation.findUnique({
+      where: { id: conversationId, userId }
+    });
+
+    if (!conversation) {
+      return res.status(404).json({ error: 'Conversation not found' });
     }
 
     // Process message with AI service (example)
@@ -37,9 +46,19 @@ exports.sendMessage = async (req, res, next) => {
 // Handler for fetching all messages in a conversation
 exports.getConversation = async (req, res, next) => {
   const { conversationId } = req.params;
+  const userId = req.user.id; // Get the user ID from the authenticated user
 
   try {
-    const conversation = await getConversation(conversationId); // Assuming getConversation returns messages
+    // Ensure the conversation belongs to the authenticated user
+    const conversation = await prisma.conversation.findUnique({
+      where: { id: conversationId, userId },
+      include: { messages: true },
+    });
+
+    if (!conversation) {
+      return res.status(404).json({ error: 'Conversation not found' });
+    }
+
     res.json({ conversation });
   } catch (error) {
     console.error('Error getting conversation:', error);
@@ -47,27 +66,37 @@ exports.getConversation = async (req, res, next) => {
   }
 };
 
-// for deleting the whole conversation
+// Handler for deleting the whole conversation
 exports.deleteConversation = async (req, res) => {
   const { conversationId } = req.params;
+  const userId = req.user.id; // Get the user ID from the authenticated user
 
   try {
-    const result = await deleteConversationById(conversationId);
-    if (!result.success) {
-      return res.status(404).json({ success: false, message: result.message });
+    // Ensure the conversation belongs to the authenticated user
+    const conversation = await prisma.conversation.findUnique({
+      where: { id: conversationId, userId },
+    });
+
+    if (!conversation) {
+      return res.status(404).json({ error: 'Conversation not found' });
     }
-    return res.status(200).json({ success: true, message: result.message });
+
+    await deleteConversationById(conversationId);
+    return res.status(200).json({ success: true, message: 'Conversation deleted' });
   } catch (error) {
+    console.error('Error deleting conversation:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 
-exports.getAllConversationIds = async(req, res, next) => {
+// Handler for fetching all conversation IDs for the authenticated user
+exports.getAllConversationIds = async (req, res, next) => {
+  const userId = req.user.id; // Get the user ID from the authenticated user
+
   try {
     const conversationIds = await prisma.conversation.findMany({
-      select: {
-        id: true,
-      },
+      where: { userId },
+      select: { id: true },
     });
     res.json(conversationIds);
   } catch (error) {
@@ -76,4 +105,29 @@ exports.getAllConversationIds = async(req, res, next) => {
   } finally {
     await prisma.$disconnect();
   }
-}
+};
+
+exports.latestConversation = async (req, res) => {
+  const userId = req.user.id; // Get the user ID from the authenticated user
+
+  try {
+    const latestConversation = await prisma.conversation.findFirst({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (latestConversation) {
+      res.json({ conversationId: latestConversation.id });
+    } else {
+      res.status(404).json({ error: 'No conversations found' });
+    }
+  } catch (error) {
+    console.error('Error fetching latest conversation:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// Handler for checking authentication
+exports.checkAuthentication = (req, res) => {
+  res.json({ authenticated: true, user: req.user });
+};

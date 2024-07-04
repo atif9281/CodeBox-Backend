@@ -5,10 +5,15 @@ const conversationRoutes = require('./routes/conversationRoutes');
 const authRoutes = require('./routes/authRoutes')
 
 const app = express();
+const cookieParser = require('cookie-parser');
 
 // Middleware
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3001',
+  credentials: true
+}));
+app.use(cookieParser()); // Ensure you can parse cookies
 
 // API Routes
 app.use('/api', conversationRoutes);

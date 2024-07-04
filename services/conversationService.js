@@ -1,6 +1,21 @@
 const prisma = require('../models/prismaClient');
 const { getTogetherAIResponse } = require('../utils/togetherAI');
 
+// Function to start a new conversation
+exports.startConversation = async (userId) => {
+  try {
+    const conversation = await prisma.conversation.create({
+      data: {
+        userId: userId, // Associate the conversation with the user ID
+      },
+    });
+    return conversation; // Return the created conversation object
+  } catch (error) {
+    console.error('Error starting conversation:', error);
+    throw error; // Throw error for handling in controller or service layer
+  }
+};
+
 exports.getAllConversationIds = async() => {
   try {
     const conversationIds = await prisma.conversationIdOnly.findMany();
@@ -14,11 +29,7 @@ exports.getAllConversationIds = async() => {
 }
 
 
-exports.startConversation = async () => {
-  return prisma.conversation.create({
-    data: {},
-  });
-};
+
 
 exports.sendMessage = async (conversationId, message, sender) => {
 

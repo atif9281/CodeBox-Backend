@@ -13,12 +13,11 @@ const signToken = id => {
     // Calculate cookie expiration time
     const cookieExpiresIn = process.env.JWT_COOKIE_EXPIRES_IN || 90; // Default to 90 days if env variable is not set
     const cookieOptions = {
-        expires: new Date(Date.now() + cookieExpiresIn * 24 * 60 * 60 * 1000), // Convert days to milliseconds
-        httpOnly: true
+        expires: new Date(Date.now() + cookieExpiresIn * 24 * 60 * 60 * 1000) // Convert days to milliseconds
     };
 
     if (process.env.NODE_ENV === 'production') {
-        cookieOptions.secure = true;
+        cookieOptions.secure = false;
     }
 
     res.cookie('jwt', token, cookieOptions);
@@ -92,8 +91,7 @@ const signToken = id => {
   
   exports.logout = (req, res) => {
     res.cookie('jwt', 'loggedout', {
-      expires: new Date(Date.now() + 10 * 1000),
-      httpOnly: true
+      expires: new Date(Date.now() + 10 * 1000)
     });
     res.status(200).json({ status: 'success' , message : 'cookies cleared successfully!' });
   };
